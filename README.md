@@ -1,7 +1,6 @@
 # Progetto-LASD-2-Grafi-
 #include <stdio.h>
-
-//dato un grafo verificare se ci sono cicli
+#include <stdlib.h>
 
 typedef struct list {
 	int key;
@@ -18,15 +17,19 @@ int isEmpty(graph *G);
 void stampaGrafo(graph *G);
 void aggiungiArco(graph *G, int u, int v);
 void rimuoviArco(graph *G, int u, int v);
+graph *inserisciNodo(graph *G);
+void cancellaGrafo(graph *G); //da rivedere la stampa
+//fare DFS1 E BFS
 
 graph *creaGrafo(int grandezza) {
-	graph *G, int i;
+	graph *G;
+	int i;
 	G = (graph*)malloc(sizeof(graph));
 	if(G) {
 		G->nodi = (lista**)malloc(grandezza*sizeof(lista*));
 		if(G->nodi) {
 			G->nv = grandezza;
-			for(i = 0; i < n; i++) G->nodi[i] = NULL;
+			for(i = 0; i < grandezza; i++) G->nodi[i] = NULL;
 		}
 		else {
 			printf("\n\nOh no adios\n\n");
@@ -46,7 +49,7 @@ int isEmpty(graph *G) {
 }
 
 void stampaGrafo(graph *G) {
-	
+	if(G) {
 	int i = 0, ne = 0;
 	lista *e;
 	if(!isEmpty(G)) {
@@ -62,7 +65,9 @@ void stampaGrafo(graph *G) {
 			printf("\n");
 		}
 		printf("Il grafo ha %d archi \n", ne);
+	}	
 	}
+	
 }
 
 void aggiungiArco(graph *G, int u, int v) {
@@ -98,5 +103,62 @@ void rimuoviArco(graph *G, int u, int v) {
 	}
 	free(e);
 }
+
+graph *inserisciNodo(graph *G) {
+	lista **e;
+	if(G == NULL) {
+		graph *g = creaGrafo(1);
+		return g;	
+	} 
+	e = realloc(G->nodi, (G->nv+1)*sizeof(lista*));
+	if(e == NULL) printf("\n\nOh no adios\n\n");
+	else {
+		G->nodi = e;
+		G->nodi[G->nv] = NULL;
+		G->nv = G->nv+1;
+	}
+	return G;
+}
+
+void cancellaGrafo(graph *G) {
+	int i;
+	lista *e, *next;
+	if(G) {
+		if(G->nv > 0) {
+			for(i = 0; i < G->nv; i++) {
+				e = G->nodi[i];
+				while(e != NULL) {
+					next = e->next;
+					free(e);
+					e = next;
+				}
+			}
+			free(G->nodi);
+		}
+		free(G);
+	}
+}
+
+
+int main() {
+	graph *G;
+	G = creaGrafo(5);
+	aggiungiArco(G, 1, 2);
+	stampaGrafo(G);
+	G = inserisciNodo(G);
+	aggiungiArco(G, 3, 5);
+	aggiungiArco(G, 3, 4);
+	aggiungiArco(G, 3, 2);
+	stampaGrafo(G);
+	printf("elimino");
+	cancellaGrafo(G);
+	stampaGrafo(G);
+	
+}
+
+
+
+
+
 
 
